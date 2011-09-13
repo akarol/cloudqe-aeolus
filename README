@@ -1,0 +1,19 @@
+#THIS SCRIPT IS TO INSTALL AEOLUS BY:
+# Install all the rpms from the last released repo and then pull all the src and compile
+# Install from the src 
+# Update aeolus components
+
+Usage:
+For help:
+./install.py -h
+
+Usage examples:
+Install from repo:
+ ./install.py -r --repo
+
+Install from src:
+ ./install.py -s --src -p --base_dir '/home'
+
+ 
+Updating component:
+ ./install.py -f --factory -p --base_dir '/home/xyz'
