@@ -30,6 +30,7 @@ import shutil
 import re
 import errno
 import logging
+import pdb
 
 
 
@@ -42,7 +43,7 @@ logging.basicConfig(level=logging.DEBUG,
 
 #Execute command
 def exec_command(cmdstring):
-    v, o = commands.getstatusoutput(cmdstring)          
+    v, o = commands.getstatusoutput(cmdstring)
     if v:
         logging.debug(o)
         raise Exception("%s: FAILED" % cmdstring);
@@ -58,13 +59,16 @@ def aeolus_cleanup():
      check_exist = 'rpm -qa | grep aeolus'
      logging.info('Checking if old aeolus version is installed')
      logging.info('running: %s' % check_exist)
+     #pdb.set_trace()
      v, o = commands.getstatusoutput(check_exist)
      logging.info('output:\n %s' % o)
+     logging.info('output:\n %s' % v)
      if o:
-           aeolus_clean = 'sudo aeolus-cleanup'
+           aeolus_clean = 'aeolus-cleanup -v'
            logging.info('running: %s' % aeolus_clean)
-           exec_command(aeolus_clean)
-           uninstl_aeolus = 'sudo yum -y remove  aeolus-all'
+           out = exec_command(aeolus_clean)
+           logging.info('output:\n %s' % out)  
+           uninstl_aeolus = ' yum -y remove  aeolus-all'
            logging.info('running: %s' % uninstl_aeolus)
            exec_command(uninstl_aeolus) 
      else:
@@ -72,55 +76,61 @@ def aeolus_cleanup():
 
 #cleanup
 def  cleanup_aeolus():
-     check_exist = 'rpm -qa | grep aeolus'
      logging.info('Checking which old aeolus version is installed')
+     check_exist = 'rpm -qa | grep aeolus'
      logging.info('running: %s' % check_exist)
      v, o = commands.getstatusoutput(check_exist)
      logging.info('The aeolus version installed:\n %s' % o)
-     aeolus_clean = 'sudo aeolus-cleanup'
+     aeolus_clean = ' aeolus-cleanup'
      logging.info('running: %s' % aeolus_clean)
      exec_command(aeolus_clean)
 
 
 #Add repo
 def addrepo():
-    addrepo = 'sudo wget -O /etc/yum.repos.d/fedora-aeolus-testing.repo http://repos.fedorapeople.org/repos/aeolus/conductor/testing/fedora-aeolus-testing.repo' 
+    print("adding repo")
+    addrepo = ' wget -O /etc/yum.repos.d/fedora-aeolus-testing.repo http://repos.fedorapeople.org/repos/aeolus/conductor/testing/fedora-aeolus-testing.repo' 
     logging.info('running: %s' % addrepo)
     out = exec_command(addrepo)
 
 
 #Install all the prerequisite aeolus packages
 def instpkg():
-    instpkg = 'sudo yum -y install aeolus-all'
+    instpkg = ' yum -y install aeolus-all'
     logging.info('running: %s' % instpkg)
     exec_command(instpkg)
 
 
 #aeolus-configure
 def aeolus_configure():
-    ae_conf = 'sudo aeolus-configure'
+    print("running configure")
+    ae_conf = ' aeolus-configure'
     logging.info('running: %s' % ae_conf)
-    exec_command(ae_conf)
+    out = exec_command(ae_conf)
+    logging.info("wes")
+    logging.info('output:\n %s' % out)  
+    
+    
 
 
 #run check_services
 def check_services():
     #os.chdir('/home/aeolus-script')
-    chk_service = './checkServices.rb'
+    chk_service = '/usr/bin/aeolus-check-services'
     logging.info('running: %s' % chk_service )
     out = exec_command(chk_service)
     logging.info('output:\n %s' % out)   
 
 #Install the required development packages for conductor
 def inst_dev_pkg():
-    instdevpkg = 'sudo yum -y install classads-devel git rest-devel rpm-build ruby-devel zip '
+    instdevpkg = ' yum -y install classads-devel git rest-devel rpm-build ruby-devel zip '
     logging.info('running: %s' % instdevpkg)
     exec_command(instdevpkg)
 
 
 #Install the required development packages for iwhd
 def inst_dev_pkg_iwhd():
-    instdevpkg = 'sudo yum install jansson-devel libmicrohttpd-devel hail-devel gc-devel git gperf mongodb-devel help2man mongodb-server'
+    instdevpkg = ' yum install jansson-devel libmicrohttpd-devel hail-devel gc-devel git gperf mongodb-devel help2man mongodb-server'
     logging.info('running: %s' % instdevpkg)
     exec_command(instdevpkg)
     
@@ -139,7 +149,7 @@ def pullsrc_compile_conductor(base_dir):
     logging.info('Cloning the conductor git repositiry')
     #os.makedirs(base_dir[0])
     os.chdir(base_dir[0])
-    clone = 'sudo git clone git://git.fedorahosted.org/git/aeolus/conductor.git'
+    clone = ' git clone git://git.fedorahosted.org/git/aeolus/conductor.git'
     logging.info('running: %s' % clone)
     exec_command(clone)
     if os.path.exists(rpmbuild_dir):
@@ -155,7 +165,7 @@ def pullsrc_compile_conductor(base_dir):
 def inst_frm_src_conductor():
     logging.info('Installing rpms from src')
     os.chdir(rpmpath)
-    rpm_install = 'sudo yum -y localinstall aeolus* --nogpgcheck'  
+    rpm_install = ' yum -y localinstall aeolus* --nogpgcheck'  
     logging.info('running: %s' % rpm_install)
     exec_command(rpm_install)
     check_exist = 'rpm -qa | grep aeolus'
@@ -176,7 +186,7 @@ def pullsrc_compile_Oz(base_dir):
        shutil.rmtree(clone_Oz_dir)
     logging.info('Cloning the Oz git repositiry')
     os.chdir(base_dir[0])
-    clone = 'sudo git clone git://github.com/clalancette/oz.git'
+    clone = ' git clone git://github.com/clalancette/oz.git'
     logging.info('running: %s' % clone)
     exec_command(clone)
     if os.path.exists(rpmbuild_dir):
@@ -196,7 +206,7 @@ def inst_frm_src_oz():
     logging.info('The oz version installed before updating:\n %s' % o)
     logging.info('Installing rpms from src')
     os.chdir(rpmpath)
-    rpm_install = 'sudo yum -y localinstall oz* --nogpgcheck'
+    rpm_install = ' yum -y localinstall oz* --nogpgcheck'
     logging.info('running: %s' % rpm_install)
     exec_command(rpm_install)
     v, o = commands.getstatusoutput(check_oz)
@@ -214,7 +224,7 @@ def pullsrc_compile_image_factory(base_dir):
        shutil.rmtree(clone_imgfact_dir)
     logging.info('Cloning the imagefactory git repositiry')
     os.chdir(base_dir[0])
-    clone = 'sudo git clone https://github.com/aeolusproject/imagefactory'
+    clone = ' git clone https://github.com/aeolusproject/imagefactory'
     logging.info('running: %s' % clone)
     exec_command(clone)
     if os.path.exists(rpmbuild_dir):
@@ -233,7 +243,7 @@ def inst_frm_src_image_factory():
     logging.info('The imagefactory version installed before updating:\n %s' % o)
     logging.info('Installing rpms from src')
     os.chdir(rpmpath)
-    rpm_install = 'sudo yum -y localinstall *noarch.rpm --nogpgcheck'
+    rpm_install = ' yum -y localinstall *noarch.rpm --nogpgcheck'
     logging.info('running: %s' % rpm_install)
     exec_command(rpm_install)
     v, o = commands.getstatusoutput(check_factory)
@@ -254,7 +264,7 @@ def pullsrc_compile_iwhd(base_dir):
        shutil.rmtree(clone_iwhd_dir)
     logging.info('Cloning the iwhd git repositiry')
     os.chdir(base_dir[0])
-    clone = 'sudo git clone git://git.fedorahosted.org/iwhd.git'
+    clone = ' git clone git://git.fedorahosted.org/iwhd.git'
     logging.info('running: %s' % clone)
     exec_command(clone)
     if os.path.exists(rpmbuild_dir):
@@ -282,7 +292,7 @@ def inst_frm_src_iwhd():
     logging.info('The iwhd version installed before updating:\n %s' % o)
     logging.info('Installing rpms from src')
     os.chdir(iwhd_rpmpath)
-    rpm_install = 'sudo yum -y localinstall iwhd* --nogpgcheck'
+    rpm_install = ' yum -y localinstall iwhd* --nogpgcheck'
     logging.info('running: %s' % rpm_install)
     exec_command(rpm_install)
     v, o = commands.getstatusoutput(check_iwhd)
@@ -307,7 +317,7 @@ def pullsrc_compile_audry(base_dir):
        shutil.rmtree(clone_audrey_dir)
     logging.info('Cloning the audrey git repositiry')
     os.chdir(base_dir[0])
-    clone = 'sudo git clone git://github.com/clalancette/audrey.git -b config-server'
+    clone = ' git clone git://github.com/clalancette/audrey.git -b config-server'
     logging.info('running: %s' % clone)
     exec_command(clone)
     if os.path.exists(rpmbuild_dir):
@@ -323,7 +333,7 @@ def pullsrc_compile_audry(base_dir):
 def inst_frm_src_audry():
     logging.info('Installing rpms from src')
     os.chdir(rpmpath)
-    rpm_install = 'sudo yum -y localinstall aeolus-config* --nogpgcheck'
+    rpm_install = ' yum -y localinstall aeolus-config* --nogpgcheck'
     logging.info('running: %s' % rpm_install)
     exec_command(rpm_install)
 

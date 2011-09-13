@@ -31,6 +31,7 @@ import subprocess as sub
 import os
 import shutil
 import aeoluslib
+import logging
 
 parser = OptionParser(usage="usage: %prog [options]\n ex: ./install.py -o --oz -p --base_dir '/home'", version="%prog 1.0")
 parser.add_option("-r", "--repo", action="store_true", dest="repo",   default=False, help="Install conductor from repo(does not require base dir)")
@@ -45,9 +46,18 @@ parser.add_option("-p", "--base_dir", action="store", dest="base_dir",  default=
 parser.add_option("-d", "--debug",       action="store_true", dest="debug",       default=False, help="print debug output",)
 (options, args) = parser.parse_args()
 
+LOG_FILENAME = 'output.log'
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(message)s',
+                    filename=LOG_FILENAME,
+                    filemode='w')
 
 if options.repo:
-        aeoluslib.aeolus_cleanup()
+        print("installing from repo")
+        try:
+         aeoluslib.aeolus_cleanup()
+        except:
+         print("could not uninstall")
         aeoluslib.addrepo()
         aeoluslib.instpkg()
         aeoluslib.aeolus_configure()
