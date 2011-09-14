@@ -241,7 +241,7 @@ def inst_frm_src_oz():
     v, o = commands.getstatusoutput(check_oz)
     logging.info('The updated oz version installed:\n %s' % o)
 
-#install oz from source
+#install configure from source
 def inst_frm_src_configure():
     check_configure = 'rpm -qa | grep aeolus-configure'
     logging.info('running: %s' % check_configure)
