@@ -213,14 +213,14 @@ def pullsrc_compile_Configure(base_dir):
     logging.info('Cloning aeolus configure repoistory')
     os.chdir(base_dir)
     clone = 'git clone git://git.fedorahosted.org/aeolus/configure.git'
-    logging.info('running: %' % clone)
+    logging.info('running: '+ clone)
     exec_command(clone)
     if os.path.exists(rpmbuild_dir):
        logging.info('Removing existing rpmbuild dir that was detected...')
        shutil.rmtree(rpmbuild_dir)  
     print clone_Configure_dir
     os.chdir(clone_Configure_dir)
-    mkrpms = 'make rpms'
+    mkrpms = 'rake rpms'
     logging.info('running: %s' % mkrpms)
     exec_command(mkrpms)
 
