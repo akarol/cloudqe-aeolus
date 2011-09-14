@@ -218,7 +218,7 @@ def pullsrc_compile_Configure(base_dir):
     if os.path.exists(rpmbuild_dir):
        logging.info('Removing existing rpmbuild dir that was detected...')
        shutil.rmtree(rpmbuild_dir)  
-    print clone_Configure_dir
+    print(clone_Configure_dir)
     os.chdir(clone_Configure_dir)
     mkrpms = 'rake rpms'
     logging.info('running: %s' % mkrpms)
