@@ -39,7 +39,8 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s',
                     filename=LOG_FILENAME,
                     filemode='w')
-
+rpmbuild_dir = os.path.expanduser(os.path.join('~','rpmbuild/'))
+rpmpath = os.path.expanduser(os.path.join('~','rpmbuild/RPMS/noarch/'))
 
 #Execute command
 def exec_command(cmdstring):
@@ -136,19 +137,19 @@ def inst_dev_pkg_iwhd():
     
 
 
-rpmbuild_dir = '/root/rpmbuild/'
-rpmpath = '/root/rpmbuild/RPMS/noarch'
+
+
 
 component_cond = 'conductor' 
 #Clone the Conductor git repository and compile
 def pullsrc_compile_conductor(base_dir):
-    clone_cond_dir = os.path.join(base_dir[0],component_cond)
+    clone_cond_dir = os.path.join(base_dir,component_cond)
     if os.path.exists(clone_cond_dir):
        logging.info('Removing existing cloned git repo that was detected...')
        shutil.rmtree(clone_cond_dir) 
     logging.info('Cloning the conductor git repositiry')
-    #os.makedirs(base_dir[0])
-    os.chdir(base_dir[0])
+    #os.makedirs(base_dir)
+    os.chdir(base_dir)
     clone = ' git clone git://git.fedorahosted.org/git/aeolus/conductor.git'
     logging.info('running: %s' % clone)
     exec_command(clone)
@@ -180,12 +181,13 @@ def inst_frm_src_conductor():
 component_oz = 'oz'
 #clone the Oz git repository and compile
 def pullsrc_compile_Oz(base_dir):
-    clone_Oz_dir = os.path.join(base_dir[0],component_oz)
+    print('base_dir= '+base_dir)
+    clone_Oz_dir = os.path.join(base_dir,component_oz)
     if os.path.exists(clone_Oz_dir):
        logging.info('Removing existing cloned git repo that was detected...')
        shutil.rmtree(clone_Oz_dir)
     logging.info('Cloning the Oz git repositiry')
-    os.chdir(base_dir[0])
+    os.chdir(base_dir)
     clone = ' git clone git://github.com/clalancette/oz.git'
     logging.info('running: %s' % clone)
     exec_command(clone)
@@ -197,6 +199,33 @@ def pullsrc_compile_Oz(base_dir):
     mkrpms = 'make rpm'
     logging.info('running: %s' % mkrpms)
     exec_command(mkrpms)
+
+#pull and build configure 
+component_configure = 'configure'
+def pullsrc_compile_Configure(base_dir):
+    require_rpms ='rubygem-rspec.noarch rpm-build'
+    logging.info('installing required rpms '+require_rpms)
+    exec_command('yum -y install '+require_rpms)
+    clone_Configure_dir = os.path.join(base_dir,component_configure)
+    if os.path.exists(clone_Configure_dir):
+        logging.info('Removing existing cloned git repo')
+        shutil.rmtree(clone_Configure_dir)
+    logging.info('Cloning aeolus configure repoistory')
+    os.chdir(base_dir)
+    clone = 'git clone git://git.fedorahosted.org/aeolus/configure.git'
+    logging.info('running: %' % clone)
+    exec_command(clone)
+    if os.path.exists(rpmbuild_dir):
+       logging.info('Removing existing rpmbuild dir that was detected...')
+       shutil.rmtree(rpmbuild_dir)  
+    print clone_Configure_dir
+    os.chdir(clone_Configure_dir)
+    mkrpms = 'make rpms'
+    logging.info('running: %s' % mkrpms)
+    exec_command(mkrpms)
+
+    
+    
 
 #install oz from source
 def inst_frm_src_oz():
@@ -218,12 +247,12 @@ def inst_frm_src_oz():
 component_factory = 'imagefactory'
 #clone the image_factory git repository and compile
 def pullsrc_compile_image_factory(base_dir):
-    clone_imgfact_dir = os.path.join(base_dir[0],component_factory)
+    clone_imgfact_dir = os.path.join(base_dir,component_factory)
     if os.path.exists(clone_imgfact_dir):
        logging.info('Removing existing cloned git repo that was detected...')
        shutil.rmtree(clone_imgfact_dir)
     logging.info('Cloning the imagefactory git repositiry')
-    os.chdir(base_dir[0])
+    os.chdir(base_dir)
     clone = ' git clone https://github.com/aeolusproject/imagefactory'
     logging.info('running: %s' % clone)
     exec_command(clone)
@@ -255,15 +284,15 @@ def inst_frm_src_image_factory():
   
 
 component_iwhd = 'iwhd'
-iwhd_rpmpath = '/root/rpmbuild/RPMS/x86_64'
+iwhd_rpmpath = '~/rpmbuild/RPMS/x86_64'
 #clone the iwhd git repository and compile
 def pullsrc_compile_iwhd(base_dir):
-    clone_iwhd_dir = os.path.join(base_dir[0],component_iwhd) 
+    clone_iwhd_dir = os.path.join(base_dir,component_iwhd) 
     if os.path.exists(clone_iwhd_dir):
        logging.info('Removing existing cloned git repo that was detected...')
        shutil.rmtree(clone_iwhd_dir)
     logging.info('Cloning the iwhd git repositiry')
-    os.chdir(base_dir[0])
+    os.chdir(base_dir)
     clone = ' git clone git://git.fedorahosted.org/iwhd.git'
     logging.info('running: %s' % clone)
     exec_command(clone)
@@ -310,13 +339,13 @@ def inst_frm_src_iwhd():
 component_aud = 'audrey'
 #clone the audery git repository and compile
 def pullsrc_compile_audry(base_dir):
-    clone_audrey_dir = os.path.join(base_dir[0],component_aud)
+    clone_audrey_dir = os.path.join(base_dir,component_aud)
     config_path = clone_audrey_dir + 'configserver'
     if os.path.exists(clone_audrey_dir):
        logging.info('Removing existing cloned git repo that was detected...')
        shutil.rmtree(clone_audrey_dir)
     logging.info('Cloning the audrey git repositiry')
-    os.chdir(base_dir[0])
+    os.chdir(base_dir)
     clone = ' git clone git://github.com/clalancette/audrey.git -b config-server'
     logging.info('running: %s' % clone)
     exec_command(clone)

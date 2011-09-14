@@ -40,17 +40,23 @@ parser.add_option("-u", "--all", action="store_true", dest="all",   default=Fals
 parser.add_option("-c", "--conductor", action="store_true", dest="conductor",   default=False, help="update conductor")
 parser.add_option("-o", "--oz", action="store_true", dest="oz",   default=False, help="update oz")
 parser.add_option("-f", "--factory", action="store_true", dest="factory",   default=False, help="update factory")
-parser.add_option("-i", "--iwhd", action="store_true", dest="iwhd",   default=False, help="update iwhd")
-parser.add_option("-a", "--audrey", action="store_true", dest="audrey",   default=False, help="update audrey")
-parser.add_option("-p", "--base_dir", action="store", dest="base_dir",  default=False, help="providing a base dir for installtion")
-parser.add_option("-d", "--debug",       action="store_true", dest="debug",       default=False, help="print debug output",)
+parser.add_option("-i", "--iwhd", action="store_true", dest="iwhd", default=False, help="update iwhd")
+parser.add_option("-a", "--audrey", action="store_true", dest="audrey", default=False, help="update audrey")
+parser.add_option("-z", "--configure", action="store_true", dest="configure", default=False, help="update audrey")
+parser.add_option('-p','--base_dir', type='string',dest='dir',help='base dir of checkout')
+parser.add_option("-d", "--debug", action="store_true", dest="debug", default=False, help="print debug output",)
 (options, args) = parser.parse_args()
+base_dir = str(options.dir)
+
 
 LOG_FILENAME = 'output.log'
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(message)s',
                     filename=LOG_FILENAME,
                     filemode='w')
+
+logging.info('base_dir='+base_dir)
+os.system("mkdir "+base_dir)
 
 if options.repo:
         print("installing from repo")
@@ -65,8 +71,8 @@ if options.repo:
         #aeoluslib.inst_dev_pkg()
         #aeoluslib.pullsrc_compile()
 
-if options.src and options.base_dir:
-        base_dir = args
+if options.src and options.dir:
+        
         aeoluslib.aeolus_cleanup()
         aeoluslib.addrepo()
         aeoluslib.instpkg()
@@ -77,8 +83,8 @@ if options.src and options.base_dir:
         aeoluslib.check_services()
 
 
-if options.conductor and options.base_dir:
-        base_dir = args
+if options.conductor and options.dir:
+        
         aeoluslib.cleanup_aeolus()
         aeoluslib.inst_dev_pkg()
         aeoluslib.pullsrc_compile_conductor(base_dir)
@@ -87,32 +93,36 @@ if options.conductor and options.base_dir:
         aeoluslib.check_services()
 
 
-if options.oz and options.base_dir:
-        base_dir = args  
+if options.oz and options.dir:
+          
         aeoluslib.pullsrc_compile_Oz(base_dir)
         aeoluslib.inst_frm_src_oz()
 
 
-if options.factory and options.base_dir:
-        base_dir = args
+if options.factory and options.dir:
+        
         aeoluslib.pullsrc_compile_image_factory(base_dir)
        #aeoluslib.inst_frm_src_image_factory()
+       
+if options.configure and options.dir:
+        
+        aeoluslib.pullsrc_compile_Configure(base_dir)
 
-if options.iwhd and options.base_dir:
-        base_dir = args
+if options.iwhd and options.dir:
+        
         aeoluslib.inst_dev_pkg_iwhd()
         aeoluslib.pullsrc_compile_iwhd(base_dir)
         aeoluslib.inst_frm_src_iwhd()
 
 
-if options.audrey and options.base_dir:
-        base_dir = args
+if options.audrey and options.dir:
+        
         aeoluslib.pullsrc_compile_audry(base_dir)
         aeoluslib.inst_frm_src_audry()
 
 
-if options.all and options.base_dir:
-       base_dir = args
+if options.all and options.dir:
+       
        aeoluslib.cleanup_aeolus()
        aeoluslib.inst_dev_pkg()
        aeoluslib.pullsrc_compile_conductor(basedir)
