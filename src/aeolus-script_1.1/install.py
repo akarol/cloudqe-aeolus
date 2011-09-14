@@ -102,7 +102,7 @@ if options.oz and options.dir:
 if options.factory and options.dir:
         
         aeoluslib.pullsrc_compile_image_factory(base_dir)
-       #aeoluslib.inst_frm_src_image_factory()
+        aeoluslib.inst_frm_src_image_factory()
        
 if options.configure and options.dir:
         
