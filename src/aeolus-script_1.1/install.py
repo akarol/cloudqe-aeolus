@@ -105,8 +105,8 @@ if options.factory and options.dir:
         aeoluslib.inst_frm_src_image_factory()
        
 if options.configure and options.dir:
-        
         aeoluslib.pullsrc_compile_Configure(base_dir)
+        inst_frm_src_configure()
 
 if options.iwhd and options.dir:
         

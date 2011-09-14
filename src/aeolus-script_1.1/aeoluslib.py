@@ -241,6 +241,19 @@ def inst_frm_src_oz():
     v, o = commands.getstatusoutput(check_oz)
     logging.info('The updated oz version installed:\n %s' % o)
 
+#install oz from source
+def inst_frm_src_configure():
+    check_configure = 'rpm -qa | grep aeolus-configure'
+    logging.info('running: %s' % check_configure)
+    v, o = commands.getstatusoutput(check_configure)
+    logging.info('The configure version installed before updating:\n %s' % o)
+    logging.info('Installing rpms from src')
+    os.chdir(rpmpath)
+    rpm_install = ' yum -y localinstall aeolus-configure* --nogpgcheck'
+    logging.info('running: %s' % rpm_install)
+    exec_command(rpm_install)
+    v, o = commands.getstatusoutput(check_configure)
+    logging.info('The updated aeolus-configure version installed:\n %s' % o)
 
 
 
